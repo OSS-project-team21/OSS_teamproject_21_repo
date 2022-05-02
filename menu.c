@@ -1,37 +1,41 @@
-
-// OSS mini project team 21 (½Å°æ½Ä ½Å°ÇÈÆ)
+// OSS mini project team 21 (ì‹ ê²½ì‹ ì‹ ê±´í›ˆ)
 
 #include <stdio.h>
 #include <string.h>
 
 typedef struct{
-    char name[30]; // ¸Ş´º ÀÌ¸§
-    int price; // ¸Ş´º °¡°İ
-    int payment; // °áÁ¦ ¼ö´Ü -  1 : Ä«µå / 2 : ÇªµåÆ÷ÀÎÆ® / 3 : Çö±İ 
-    int take_out; // Æ÷Àå À¯¹« - 1 : Æ÷Àå / 2 : Æ÷Àå¾ÈÇÔ.
+    char name[30]; // ë©”ë‰´ ì´ë¦„
+    int price; // ë©”ë‰´ ê°€ê²©
+    int payment; // ê²°ì œ ìˆ˜ë‹¨ -  1 : ì¹´ë“œ / 2 : í‘¸ë“œí¬ì¸íŠ¸ / 3 : í˜„ê¸ˆ 
+    int take_out; // í¬ì¥ ìœ ë¬´ - 1 : í¬ì¥ / 2 : í¬ì¥ì•ˆí•¨.
+    int id_num; // í•™ë²ˆ
+    int orderNum; //í¬ì¥ ëŒ€ê¸°ë²ˆí˜¸
+
 } Menu;
 
 int selectDataNo(Menu *s, int count);
 void listMenu(Menu *s , int count);
-int addMenu(Menu *s);
+int addMenu(Menu *s, int count);
 void readMenu(Menu s);
-int updateMenu(Menu *s);
+int updateMenu(Menu *s, int count);
 int deleteMenu(Menu *s); 
 void searchMenu( Menu *s , int count);
-//void saveData(Menu *s , int count);
-//int loadData(Menu *s);
+void paymentMethod(Menu *s);
+void takeOut(Menu *s, int count);
+void saveFile(Menu *s, int count);
+void loadFile(Menu *s, int count);
 
 int selectMenu(){     
     int menu;
-    printf("\n***** ÇĞ°ü ¸Ş´º *****\n");
-    printf("1. ¸Ş´º Á¶È¸\n");
-    printf("2. ¸Ş´º Ãß°¡\n");
-    printf("3. ¸Ş´º ¼öÁ¤\n");
-    printf("4. ¸Ş´º »èÁ¦\n");
-    printf("5. ÆÄÀÏÀúÀå\n");
-    printf("6. ¸Ş´º ÀÌ¸§°Ë»ö\n");
-    printf("0. Á¾·á\n\n");
-    printf("=> ¿øÇÏ´Â ¸Ş´º´Â? ");
+    printf("\n***** í•™ê´€ ë©”ë‰´ *****\n");
+    printf("1. ë©”ë‰´ ì¡°íšŒ\n");
+    printf("2. ë©”ë‰´ ì¶”ê°€\n");
+    printf("3. ë©”ë‰´ ìˆ˜ì •\n");
+    printf("4. ë©”ë‰´ ì‚­ì œ\n");
+    printf("5. íŒŒì¼ì €ì¥\n");
+    printf("6. ë©”ë‰´ ì´ë¦„ê²€ìƒ‰\n");
+    printf("0. ì¢…ë£Œ\n\n");
+    printf("=> ì›í•˜ëŠ” ë©”ë‰´ëŠ”? ");
     scanf("%d", &menu);
     return menu;
 }
@@ -39,8 +43,20 @@ int main(void){
     Menu slist[20];
     int count = 0, menu;
     int index = 0;
-
-    //count = loadData(slist);
+    FILE *file;
+    if((file=fopen("menu.txt","rt"))){
+      printf("==>ë¡œë”© ì„±ê³µ");
+      while(!feof(file)){
+          char c=getc(file);
+          if(c=='\n'){
+              count++;
+          }
+      }
+      loadFile(slist,count);
+    }
+    else{
+      printf("==>íŒŒì¼ ì—†ìŒ");
+    }
     index = count;
 
     while (1){
@@ -50,135 +66,177 @@ int main(void){
             if(count > 0)
                 listMenu(slist , index);
             else
-                printf("µ¥ÀÌÅÍ°¡ ¾ø½À´Ï´Ù.\n");
+                printf("ë°ì´í„°ê°€ ì—†ìŠµë‹ˆë‹¤.\n");
         }
         else if (menu == 2){
-            count += addMenu(&slist[index++]);
+            count += addMenu(&slist[index++], count);
 
         }
         else if (menu == 3){
             int no = selectDataNo(slist, index);
             if(no == 0){
-                printf("=> Ãë¼ÒµÊ!\n");
+                printf("=> ì·¨ì†Œë¨!\n");
                 continue;
             }
-            updateMenu(&slist[no-1]);
+            updateMenu(&slist[no-1], count);
         }
         else if (menu == 4){
             int no = selectDataNo(slist, index);
             if(no == 0){
-                printf("=> Ãë¼ÒµÊ!\n");
+                printf("=> ì·¨ì†Œë¨!\n");
                 continue;
             }
             int deletok;
-            printf("Á¤¸»·Î »èÁ¦ÇÏ½Ã°Ú½À´Ï±î? (»èÁ¦ :1)");
+            printf("ì •ë§ë¡œ ì‚­ì œí•˜ì‹œê² ìŠµë‹ˆê¹Œ? (ì‚­ì œ :1)");
             scanf("%d", &deletok);
             if(deletok == 1){
                 if(deleteMenu(&slist[no-1])) count--;
             }
         }
         else if( menu == 5){
-            //saveData(slist , index);
+            saveFile(slist , index);
         }
         else if( menu == 6){
             searchMenu(slist , index); 
         }
     }
-    printf("Á¾·áµÊ!\n");
+    printf("ì¢…ë£Œë¨!\n");
     return 0;
 }
-
 void readMenu(Menu s){
 
     printf("  < %s > \n",s.name);
-    printf("°¡°İ : %d\n",s.price);
+    printf("ê°€ê²© : %d\n",s.price);
     if(s.payment == 1)
-        printf("°áÁ¦¼ö´Ü : Ä«µå\n");
-    else if(s.payment == 2)
-        printf("°áÁ¦¼ö´Ü : ÇªµåÆ÷ÀÎÆ®\n");
+        printf("ê²°ì œìˆ˜ë‹¨ : ì¹´ë“œ\n");
+    else if(s.payment == 2){
+        printf("ê²°ì œìˆ˜ë‹¨ : í‘¸ë“œí¬ì¸íŠ¸\n");
+        printf("í•™ìƒë²ˆí˜¸ : %d\n", s.id_num);
+    }
     else
-        printf("°áÁ¦¼ö´Ü : Çö±İ\n");
-    if(s.take_out == 1)
-        printf("Æ÷ÀåÀ¯¹« : Æ÷Àå\n");
+        printf("ê²°ì œìˆ˜ë‹¨ : í˜„ê¸ˆ\n");
+    if(s.take_out == 1){
+        printf("í¬ì¥ìœ ë¬´ : í¬ì¥\n");
+        printf("í¬ì¥ë²ˆí˜¸ : %d\n", s.orderNum);
+    }
     else
-        printf("Æ÷ÀåÀ¯¹« : Æ÷Àå¾ÈÇÔ\n");  
+        printf("í¬ì¥ìœ ë¬´ : í¬ì¥ì•ˆí•¨\n");  
 }
+int addMenu(Menu *s, int count){
 
-int addMenu(Menu *s){
-
-    printf("¸Ş´ºÀÌ¸§Àº? ");
+    printf("ë©”ë‰´ì´ë¦„ì€? ");
     scanf("%s",s->name);
-    printf("°¡°İÀº? ");
+    printf("ê°€ê²©ì€? ");
     scanf("%d",&s->price);
-    printf("°áÁ¦¼ö´ÜÀº? (Ä«µå:1, ÇªµåÆ÷ÀÎÆ®:2, Çö±İ:3) ");
+    printf("ê²°ì œìˆ˜ë‹¨ì€? (ì¹´ë“œ:1, í‘¸ë“œí¬ì¸íŠ¸:2, í˜„ê¸ˆ:3) ");
     scanf("%d",&s->payment);
-    printf("Æ÷ÀåÀº? (Æ÷Àå:1, Æ÷Àå¾ÈÇÔ: 2) ");
+    if(s->payment==2){
+        paymentMethod(s);
+    }
+    printf("í¬ì¥ì€? (í¬ì¥:1, í¬ì¥ì•ˆí•¨: 2) ");
     scanf("%d",&s->take_out);
-    printf("=>Ãß°¡µÊ!\n");
+    if(s->take_out==1){
+        takeOut(s, count);
+    }
+    printf("=>ì¶”ê°€ë¨!\n");
     return 1;
 }
+int updateMenu(Menu *s, int count){
 
-int updateMenu(Menu *s){
 
-
-    printf("¸Ş´ºÀÌ¸§Àº? ");
+    printf("ë©”ë‰´ì´ë¦„ì€? ");
     scanf("%s",s->name);
-    printf("°¡°İÀº? ");
+    printf("ê°€ê²©ì€? ");
     scanf("%d",&s->price);
-    printf("°áÁ¦¼ö´ÜÀº? (Ä«µå:1, ÇªµåÆ÷ÀÎÆ®:2, Çö±İ:3) ");
+    printf("ê²°ì œìˆ˜ë‹¨ì€? (ì¹´ë“œ:1, í‘¸ë“œí¬ì¸íŠ¸:2, í˜„ê¸ˆ:3) ");
     scanf("%d",&s->payment);
-    printf("Æ÷ÀåÀº? (Æ÷Àå:1, Æ÷Àå¾ÈÇÔ: 2) ");
+    if(s->payment==2){
+        paymentMethod(s);
+    }
+    printf("í¬ì¥ì€? (í¬ì¥:1, í¬ì¥ì•ˆí•¨: 2) ");
     scanf("%d",&s->take_out);
-    printf("=> ¼öÁ¤µÊ!\n");
+    if(s->take_out==1){
+        takeOut(s, count);
+    }
+    printf("=> ìˆ˜ì •ë¨!\n");
 
     return 0;
 }
-
 int deleteMenu(Menu *s){
     s->price = -1;
     s->payment = -1;
     s->take_out = -1;
-    printf("»èÁ¦µÊ!\n"); 
+    s->id_num = -1;
+    s->orderNum = 0;
+    printf("ì‚­ì œë¨!\n"); 
 
     return 1;
 } 
-
 void listMenu(Menu *s , int count){
     printf("================================\n");
     for(int i=0; i<count; i++){
         if(s[i].price == -1) continue;
-        printf("====== %d¹ø menu ======\n",i+1);
+        printf("====== %dë²ˆ menu ======\n",i+1);
         readMenu(s[i]);
     }
     printf("\n");
 }
-
 int selectDataNo(Menu *s, int count){
     int no;
     listMenu(s, count);
-    printf("¹øÈ£´Â (Ãë¼Ò :0)? ");
+    printf("ë²ˆí˜¸ëŠ” (ì·¨ì†Œ :0)? ");
     scanf("%d",&no);
     return no;
 }
-
-
-
-void searchMenu( Menu *s , int count){
+void searchMenu(Menu *s , int count){
     int scnt = 0;
     char search[20];
 
-    printf("°Ë»öÇÒ ¸Ş´ºÀÌ¸§? ");
+    printf("ê²€ìƒ‰í•  ë©”ë‰´ì´ë¦„? ");
     scanf("%s",search);
 
     printf("================================\n");
     for( int i=0; i<count; i++){
         if(s[i].price == -1) continue;
         if(strstr(s[i].name,search)){
-            printf("====== %d¹ø menu ======\n",i+1);
+            printf("====== %dë²ˆ menu ======\n",i+1);
             readMenu(s[i]);
             scnt++;
         }
     }
-    if(scnt == 0) printf("=> °Ë»öµÈ µ¥ÀÌÅÍ ¾øÀ½!");
+    if(scnt == 0) printf("=> ê²€ìƒ‰ëœ ë°ì´í„° ì—†ìŒ!");
     printf("\n");
+}
+void saveFile(Menu *s, int count){
+    FILE *fp;
+    fp=fopen("menu.txt", "wt");
+    for(int i=0; i<count;i++){
+        fprintf(fp,"%s %d %d %d %d %d", s[i].name, s[i].price,
+            s[i].payment, s[i].id_num, s[i].take_out, 
+            s[i].orderNum);
+    }
+    printf("íŒŒì¼ ì €ì¥!\n");
+}
+void loadFile(Menu *s, int count){
+    FILE *fp;
+    fp=fopen("menu.txt", "r");
+    for(int i=0; i<count;i++){
+        fscanf(fp,"%s %d %d %d %d %d", s[i].name, &s[i].price,
+            &s[i].payment, &s[i].id_num, &s[i].take_out, 
+            &s[i].orderNum);
+    }
+}
+void paymentMethod(Menu *s){
+    printf("í•™ë²ˆì€? : ");
+    scanf("%d", &s->id_num);
+}
+void takeOut(Menu *s, int count){
+    int x=0;
+    for(int i=0;i<count;i++){
+        if(s[i].take_out==1){
+            x++;
+        }
+    }
+    s->orderNum=x;
+    printf("í¬ì¥ë²ˆí˜¸ : %d", s->orderNum);
 }
