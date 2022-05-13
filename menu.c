@@ -45,7 +45,7 @@ int main(void){
     int index = 0;
     FILE *file;
     if((file=fopen("menu.txt","rt"))){
-      printf("==>로딩 성공");
+      printf("==> 로딩 성공");
       while(!feof(file)){
           char c=getc(file);
           if(c=='\n'){
