@@ -34,7 +34,7 @@ int selectMenu(){
     printf("4. 메뉴 삭제\n");
     printf("5. 파일저장\n");
     printf("6. 메뉴 이름검색\n");
-    printf("0. 종료\n\n");
+    printf("0. 프로그램 종료\n\n");
     printf("=> 원하는 메뉴는? ");
     scanf("%d", &menu);
     return menu;
