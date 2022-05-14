@@ -128,7 +128,7 @@ int addMenu(Menu *s, int count){
     scanf("%s",s->name);
     printf("가격은? ");
     scanf("%d",&s->price);
-    printf("결제수단은? (카드:1, 푸드포인트:2, 현금:3) ");
+    printf("결제수단은? ( 카드:1, 푸드포인트:2, 현금:3 ) ");
     scanf("%d",&s->payment);
     if(s->payment==2){
         paymentMethod(s);
