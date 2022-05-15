@@ -144,7 +144,7 @@ int addMenu(Menu *s, int count){
 int updateMenu(Menu *s, int count){
 
 
-    printf("메뉴이름은? ");
+    printf("메뉴 이름은? ");
     scanf("%s",s->name);
     printf("가격은? ");
     scanf("%d",&s->price);
