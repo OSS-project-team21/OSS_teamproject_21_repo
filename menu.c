@@ -32,7 +32,7 @@ int selectMenu(){
     printf("2. 메뉴 추가\n");
     printf("3. 메뉴 수정\n");
     printf("4. 메뉴 삭제\n");
-    printf("5. 파일저장\n");
+    printf("5. 파일 저장\n");
     printf("6. 메뉴 이름검색\n");
     printf("0. 프로그램 종료\n\n");
     printf("=> 원하는 메뉴는? ");
